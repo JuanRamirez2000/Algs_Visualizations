@@ -9,8 +9,8 @@ import Map, {
   Source,
   Layer,
 } from "react-map-gl";
-import type { SkyLayer } from "react-map-gl";
-import { useState } from "react";
+import type { MapRef, SkyLayer } from "react-map-gl";
+import { useEffect, useRef, useState } from "react";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 import { useSearchParams } from "next/navigation";
 
@@ -32,52 +32,63 @@ type Coordinate = {
   lat: number;
 };
 
-type Locations = {
+type Location = {
   name: string;
-  centerLocation: Coordinate;
-  origin: Coordinate;
-  destination: Coordinate;
+  center: Coordinate;
+  origin?: Coordinate;
+  destination?: Coordinate;
 };
 
-const locations: Locations[] = [
+const locations: Location[] = [
   {
-    name: "Los Angeles",
-    centerLocation: {
+    name: "los_angeles",
+    center: {
       long: -118.2518,
       lat: 34.0488,
     },
-    origin: {
-      long: -117.8677,
-      lat: 33.7455,
+  },
+  {
+    name: "san_francisco",
+    center: {
+      long: -122.3965,
+      lat: 37.7937,
     },
-    destination: {
-      long: -118.2518,
-      lat: 34.0488,
+  },
+  {
+    name: "new_york",
+    center: {
+      long: -74.0007,
+      lat: 40.7209,
     },
   },
 ];
 
 export default function MapContainer() {
-  const [showLocations, setShowLocations] = useState<boolean>(false);
+  const mapRef = useRef<MapRef>(null);
   const searchParams = useSearchParams();
 
-  const [originCoordinates, setOriginCoordinates] = useState({
-    latitude: 33.7455,
-    longitude: -117.8677,
-  });
+  const locationName = searchParams.get("location");
+  const locationData = locations.find(
+    (location) => location.name === locationName
+  );
 
-  const [destinationCoordinates, setDestinationCoordinates] = useState({
-    latitude: 34.0488,
-    longitude: -118.2518,
-  });
+  useEffect(() => {
+    if (!locationData) return;
+    if (!mapRef.current) return;
+    mapRef.current.flyTo({
+      center: [locationData.center.long, locationData.center.lat],
+      duration: 2000,
+    });
+  }, [searchParams, locationData]);
 
   return (
     <section className="w-full h-full">
       <Map
+        ref={mapRef}
         mapLib={import("mapbox-gl")}
         initialViewState={{
-          longitude: -118.2518,
-          latitude: 34.0488,
+          longitude: locationData ? locationData.center.long : -118.2518,
+          latitude: locationData ? locationData.center.lat : -118.2518,
           zoom: 10,
         }}
         style={{ width: "width: 100%", height: "100%" }}
@@ -85,6 +96,7 @@ export default function MapContainer() {
         mapboxAccessToken={NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
       >
+        {/* 
         <Marker
           longitude={originCoordinates.longitude}
           latitude={originCoordinates.latitude}
@@ -122,6 +134,7 @@ export default function MapContainer() {
           </>
         )}
 
+        */}
         <Source
           id="mapbox-dem"
           type="raster-dem"
