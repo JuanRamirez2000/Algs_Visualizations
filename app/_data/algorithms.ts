@@ -16,6 +16,10 @@ const algorithms: AlgorithimInfo[] = [
     name: "A Star",
     abbreviation: "AS",
   },
+  {
+    name: "Dijkstra's Algorithm",
+    abbreviation: "DA",
+  },
 ];
 
 export { algorithms };
