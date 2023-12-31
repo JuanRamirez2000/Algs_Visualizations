@@ -4,16 +4,26 @@ import Link from "next/link";
 import { RadioGroup } from "@headlessui/react";
 import { locations } from "./_data/locations";
 import { MapPinIcon } from "@heroicons/react/24/outline";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 type Range = "short" | "medium" | "long";
 const ranges: Range[] = ["short", "medium", "long"];
 
 export default function LocationSelection() {
   const searchParams = useSearchParams();
+  const pathName = usePathname();
   const selectedLocation = searchParams.get("location");
   const selectedRange = searchParams.get("range");
-  const selectedAlgorithim = searchParams.get("algorithm");
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams]
+  );
 
   return (
     <>
@@ -31,7 +41,9 @@ export default function LocationSelection() {
           bg-zinc-600 ui-active:bg-sky-600 ui-checked:bg-sky-600"
           >
             <Link
-              href={`/?location=${location.name}&range=${selectedRange}&algorithm=${selectedAlgorithim}`}
+              href={
+                pathName + "?" + createQueryString("location", location.name)
+              }
               className="flex flex-row items-center justify-between text-center px-4 py-3"
             >
               {location.displayName}
@@ -55,7 +67,7 @@ export default function LocationSelection() {
             bg-zinc-600 ui-active:bg-sky-600 ui-checked:bg-sky-600"
             >
               <Link
-                href={`/?location=${selectedLocation}&range=${range}&algorithm=${selectedAlgorithim}`}
+                href={pathName + "?" + createQueryString("range", range)}
                 className="flex flex-row items-center justify-between text-center px-4 py-3"
               >
                 {range}

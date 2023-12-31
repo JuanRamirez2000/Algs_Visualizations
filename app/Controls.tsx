@@ -1,8 +1,5 @@
 import Link from "next/link";
-import {
-  InformationCircleIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowUpRightIcon, SparklesIcon } from "@heroicons/react/24/outline";
 
 export default function Controls() {
   return (
@@ -11,7 +8,7 @@ export default function Controls() {
         href={""}
         className="w-1/2 p-4 bg-zinc-600 rounded-lg transition-all hover:scale-105 hover:bg-sky-600  inline-flex flex-row items-center justify-center gap-4"
       >
-        Info <InformationCircleIcon className="h-6 w-6" />
+        Info <ArrowUpRightIcon className="h-5 w-5" />
       </Link>
       <button className="w-1/2 p-4 bg-zinc-600 rounded-lg transition-all hover:scale-105 hover:bg-sky-600 inline-flex flex-row items-center justify-center gap-4">
         Run <SparklesIcon className="h-6 w-6" />
