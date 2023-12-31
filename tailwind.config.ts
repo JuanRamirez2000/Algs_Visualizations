@@ -1,3 +1,5 @@
+import colors from "tailwindcss/colors";
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
@@ -8,6 +10,13 @@ module.exports = {
     "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
-  theme: {},
+  theme: {
+    extend: {
+      colors: {
+        primary: colors.rose,
+        base: colors.zinc,
+      },
+    },
+  },
   plugins: [require("tailwindcss-animate"), require("@headlessui/tailwindcss")],
 };

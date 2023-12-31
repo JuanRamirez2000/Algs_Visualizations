@@ -32,7 +32,7 @@ export default function AlgorithmSelection() {
             value={algorithm.abbreviation}
             key={algorithm.abbreviation}
             className="transition-all rounded-lg hover:scale-105 w-full
-          bg-zinc-600 ui-active:bg-sky-600 ui-checked:bg-sky-600"
+          bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600"
           >
             <Link
               href={
