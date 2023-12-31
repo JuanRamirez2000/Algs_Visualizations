@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { RadioGroup } from "@headlessui/react";
-import { locations } from "./_data/locations";
+import { locations } from "../_data/locations";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
