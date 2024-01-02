@@ -1,4 +1,4 @@
-import MapContainer from "../MapContainer";
+import MapContainer from "./MapContainer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -5,10 +5,13 @@ import Map, {
   FullscreenControl,
   GeolocateControl,
 } from "react-map-gl";
-import type { MapRef } from "react-map-gl";
+import { MapRef } from "react-map-gl";
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { locations } from "./_data/locations";
+import { locations } from "../_data/locations";
+import { MapboxOverlay, MapboxOverlayProps } from "@deck.gl/mapbox/typed";
+
+import { useControl } from "react-map-gl";
 
 const NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN =
   process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -36,16 +39,17 @@ export default function MapContainer() {
       <Map
         ref={mapRef}
         mapLib={import("mapbox-gl")}
+        mapStyle="mapbox://styles/mapbox/dark-v11"
+        style={{ width: "width: 100%", height: "100%" }}
+        mapboxAccessToken={NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+        terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
         initialViewState={{
           longitude: locationData ? locationData.center.long : -117.8667,
           latitude: locationData ? locationData.center.lat : 33.7477,
           zoom: 10,
         }}
-        style={{ width: "width: 100%", height: "100%" }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-        mapboxAccessToken={NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
       >
+        <DeckGLOverlay />
         <NavigationControl />
         <ScaleControl />
         <FullscreenControl />
@@ -53,4 +57,14 @@ export default function MapContainer() {
       </Map>
     </section>
   );
+}
+
+function DeckGLOverlay(
+  props: MapboxOverlayProps & {
+    interleaved?: boolean;
+  }
+) {
+  const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
+  overlay.setProps(props);
+  return null;
 }

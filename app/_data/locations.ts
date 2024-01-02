@@ -7,6 +7,8 @@ type LocationInfo = {
   name: string;
   displayName: string;
   center: Coordinate;
+  origin_short?: Coordinate;
+  destination_short?: Coordinate;
 };
 
 const locations: LocationInfo[] = [

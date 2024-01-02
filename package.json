@@ -9,22 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@danmarshall/deckgl-typings": "^4.9.28",
     "@headlessui/react": "^1.7.17",
     "@headlessui/tailwindcss": "^0.2.0",
     "@heroicons/react": "^2.1.1",
     "@mapbox/search-js-react": "^1.0.0-beta.18",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-radio-group": "^1.1.3",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
+    "deck.gl": "^8.9.33",
     "lucide-react": "^0.300.0",
     "mapbox-gl": "^3.0.1",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "react-map-gl": "^7.1.7",
-    "tailwind-merge": "^2.2.0",
-    "tailwindcss-animate": "^1.0.7"
+    "react-map-gl": "^7.1.7"
   },
   "devDependencies": {
     "@types/node": "^20",
