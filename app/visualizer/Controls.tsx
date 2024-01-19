@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRightIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import parseData from "../helpers/parseOsm";
 
 export default function Controls() {
   return (
@@ -10,8 +13,11 @@ export default function Controls() {
       >
         Info <ArrowUpRightIcon className="h-5 w-5" />
       </Link>
-      <button className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4">
-        Run <SparklesIcon className="h-6 w-6" />
+      <button
+        className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4"
+        onClick={() => parseData()}
+      >
+        Parse <SparklesIcon className="h-6 w-6" />
       </button>
     </div>
   );
