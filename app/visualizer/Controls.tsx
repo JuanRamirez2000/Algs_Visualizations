@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRightIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUpRightIcon,
+  CodeBracketSquareIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
 import parseData from "../helpers/parseOsm";
 
-export default function Controls() {
+export default function Controls({
+  traverseGraph,
+}: {
+  traverseGraph: () => void;
+}) {
   return (
-    <div className="flex flex-row w-1/2 max-w-64 gap-4">
+    <div className="flex flex-row w-full max-w-64 gap-4 justify-center">
       <Link
         href={""}
         className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4"
@@ -17,7 +25,13 @@ export default function Controls() {
         className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4"
         onClick={() => parseData()}
       >
-        Parse <SparklesIcon className="h-6 w-6" />
+        Parse <CodeBracketSquareIcon className="h-6 w-6" />
+      </button>
+      <button
+        className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4"
+        onClick={traverseGraph}
+      >
+        Run <SparklesIcon className="h-6 w-6" />
       </button>
     </div>
   );
