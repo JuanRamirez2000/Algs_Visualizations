@@ -32,7 +32,7 @@ export default function Controls({
         Parse <CodeBracketSquareIcon className="h-6 w-6" />
       </button>
       <button
-        className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 disabled:hidden enabled:flex inline-flex flex-row items-center justify-center gap-4"
+        className="w-1/2 p-4 bg-base-600 rounded-lg enabled:transition-all enabled:hover:scale-105 enabled:hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed inline-flex flex-row items-center justify-center gap-4"
         onClick={traverseGraph}
         disabled={!algorithmSelected}
       >
