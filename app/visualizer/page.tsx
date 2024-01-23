@@ -8,6 +8,7 @@ import data from "../_data/test.json";
 import { useState } from "react";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { Node } from "../helpers/parseOsm";
+import { useSearchParams } from "next/navigation";
 
 //const initialNodeIDs = [122804252, 1925338334];
 const destination = 1927365565;
@@ -19,6 +20,8 @@ export default function Home() {
     //@ts-ignore
     Object.keys(data).map((key) => data[key])
   );
+  const searchParams = useSearchParams();
+  const selectedAlgorithm = searchParams.get("algorithm");
 
   const [visitedIDs, setDisplayNodeIDs] = useState<number[]>(initialNodeIDs);
 
@@ -48,6 +51,21 @@ export default function Home() {
     getFillColor: [139, 92, 246],
   });
 
+  const runPathFinding = () => {
+    let nodes = [];
+    switch (selectedAlgorithm) {
+      case "BFS":
+        bfs();
+        break;
+      case "DFS":
+        dfs();
+        break;
+      default:
+        console.error("No algorithm was selected");
+        break;
+    }
+  };
+
   const bfs = () => {
     const queue: number[] = [];
     queue.push(origin);
@@ -74,7 +92,7 @@ export default function Home() {
     while (stack.length !== 0) {
       const currentID = stack.pop();
       if (currentID === destination) {
-
+        setDisplayNodeIDs((prev) => [...prev, destination]);
         return;
       }
       if (!visited.includes(currentID as number)) {
@@ -100,7 +118,7 @@ export default function Home() {
       <section className="w-1/3 h-full bg-base-800 flex flex-col items-center text-zinc-100 py-20 gap-10">
         <LocationSelection />
         <AlgorithmSelection />
-        <Controls traverseGraph={dfs} />
+        <Controls traverseGraph={runPathFinding} />
       </section>
       <section className="w-2/3 h-full">
         <MapContainer layers={[nodesLayer, displayLayer]} />

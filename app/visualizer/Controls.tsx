@@ -7,12 +7,16 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import parseData from "../helpers/parseOsm";
+import { useSearchParams } from "next/navigation";
 
 export default function Controls({
   traverseGraph,
 }: {
   traverseGraph: () => void;
 }) {
+  const searchParams = useSearchParams();
+  const algorithmSelected = searchParams.get("algorithm");
+
   return (
     <div className="flex flex-row w-full max-w-64 gap-4 justify-center">
       <Link
@@ -28,8 +32,9 @@ export default function Controls({
         Parse <CodeBracketSquareIcon className="h-6 w-6" />
       </button>
       <button
-        className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 inline-flex flex-row items-center justify-center gap-4"
+        className="w-1/2 p-4 bg-base-600 rounded-lg transition-all hover:scale-105 hover:bg-primary-600 disabled:hidden enabled:flex inline-flex flex-row items-center justify-center gap-4"
         onClick={traverseGraph}
+        disabled={!algorithmSelected}
       >
         Run <SparklesIcon className="h-6 w-6" />
       </button>
