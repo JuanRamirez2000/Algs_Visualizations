@@ -81,6 +81,7 @@ export default function Home() {
   const constructPath = (
     memory: { parent: number | null; child: number }[]
   ) => {
+    //Traverse the parents from the destination until you hit null (origin)
     let path = [];
     let currentNode = memory.find((node) => node.child === destination);
     while (currentNode?.parent !== null) {
@@ -91,19 +92,29 @@ export default function Home() {
   };
 
   const bfs = () => {
-    const queue: number[] = [];
-    queue.push(origin);
-    while (queue.length !== 0) {
-      let currentID = queue.shift();
+    const frontier: number[] = [];
+    const explored: number[] = [];
+    const memory: { parent: number | null; child: number }[] = [];
+    frontier.push(origin);
+    memory.push({ parent: null, child: origin });
+    explored.push(origin);
+
+    while (frontier.length !== 0) {
+      let currentID = frontier.shift();
+      let currentNode = graph.find((node) => node.id === currentID);
+
       if (currentID === destination) {
         setDisplayNodeIDs((prev) => [...prev, destination]);
-        return currentID;
+        constructPath(memory);
+        return;
       }
-      let currentNode = graph.find((node) => node.id === currentID);
+
       currentNode?.adjNodes.map((adjID: number) => {
-        if (!visitedIDs.includes(adjID)) {
+        if (!explored.includes(adjID)) {
+          explored.push(adjID);
+          frontier.push(adjID);
+          memory.push({ parent: currentID as number, child: adjID });
           setDisplayNodeIDs((prev) => [...prev, adjID]);
-          queue.push(adjID);
         }
       });
     }
@@ -128,7 +139,7 @@ export default function Home() {
       }
 
       if (!explored.includes(currentID as number)) {
-        explored.push(currentID as number); //Add to frontier
+        explored.push(currentID as number); //Add to explored
         currentNode?.adjNodes.map((adjID: number) => {
           frontier.push(adjID);
           memory.push({ parent: currentID as number, child: adjID });
