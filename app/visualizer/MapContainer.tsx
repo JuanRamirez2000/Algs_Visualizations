@@ -6,13 +6,11 @@ import Map, {
   GeolocateControl,
 } from "react-map-gl";
 import { MapRef } from "react-map-gl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { locations } from "../_data/locations";
 import { MapboxOverlay, MapboxOverlayProps } from "@deck.gl/mapbox/typed";
 import { useControl } from "react-map-gl";
-import data from "../_data/test.json";
-import { Node } from "../helpers/parseOsm";
 import type { LayersList } from "deck.gl/typed";
 
 const NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN =

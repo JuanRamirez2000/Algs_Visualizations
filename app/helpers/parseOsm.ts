@@ -1,5 +1,5 @@
 "use server";
-import roads from "../_data/testOSMData.json";
+import roads from "../_data/export.json";
 import * as fs from "fs";
 
 //! TODO Fix these types
@@ -76,7 +76,7 @@ const connectNodes = (nodes: number[]) => {
 };
 
 const extendNodeInfo = (nodeID: number) => {
-  const { lat, lon } = nodeInfo[nodeID];
+  const { lat, lon }: { lat: number; lon: number } = nodeInfo[nodeID];
   graph[nodeID] = { id: nodeID, lat: lat, lon: lon, weights: [], adjNodes: [] };
 };
 
@@ -88,9 +88,9 @@ const initializeNodeInfo = (node: OSMNode) => {
 const parseOSMData = () => {
   const { elements } = roads;
   elements.map((element) => {
-    if (element.type === "node") initializeNodeInfo(element);
+    if (element.type === "node") initializeNodeInfo(element as OSMNode);
 
-    if (element.type === "way") connectNodes(element.nodes);
+    if (element.type === "way") connectNodes(element.nodes as number[]);
   });
   fs.writeFile("./test.json", JSON.stringify(graph), (error) => {
     if (error) {

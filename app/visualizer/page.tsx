@@ -5,13 +5,13 @@ import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
 import MapContainer from "./MapContainer";
 import data from "../_data/test.json";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { Node } from "../helpers/parseOsm";
 import { useSearchParams } from "next/navigation";
 
 //const initialNodeIDs = [122804252, 1925338334];
-const destination = 1927365565;
+const destination = 11375332250;
 const origin = 1925338334;
 const initialNodeIDs = [origin];
 
@@ -23,8 +23,9 @@ export default function Home() {
   const searchParams = useSearchParams();
   const selectedAlgorithm = searchParams.get("algorithm");
 
-  const [visitedIDs, setDisplayNodeIDs] = useState<number[]>(initialNodeIDs);
-  const [solutionIDs, setSolutionIDs] = useState<number[]>();
+  const [exploredIDs, setExploredIDs] = useState<number[]>(initialNodeIDs);
+  const [solutionIDs, setSolutionIDs] = useState<number[]>([]);
+  const [currentID, setCurrentID] = useState<number>(origin);
 
   const nodesLayer = new ScatterplotLayer({
     id: "originalNodes",
@@ -39,8 +40,9 @@ export default function Home() {
     onClick: (info) => console.log(info),
   });
 
-  const explored = graph.filter((node) => visitedIDs.includes(node.id));
+  const explored = graph.filter((node) => exploredIDs.includes(node.id));
   const solution = graph.filter((node) => solutionIDs?.includes(node.id));
+  const currentNode = graph.filter((node) => node.id === currentID);
 
   const displayLayer = new ScatterplotLayer({
     id: "displayingNodes",
@@ -49,7 +51,7 @@ export default function Home() {
     getPosition: (d) => {
       return [d.lon, d.lat];
     },
-    getRadius: 3,
+    getRadius: 5,
     getFillColor: [139, 92, 246],
   });
 
@@ -60,27 +62,76 @@ export default function Home() {
     getPosition: (d) => {
       return [d.lon, d.lat];
     },
-    getRadius: 3,
+    getRadius: 5,
     getFillColor: [239, 68, 68],
+  });
+
+  const currentExploredLayer = new ScatterplotLayer({
+    id: "currentNode",
+    data: currentNode,
+    filled: true,
+    getPosition: (d) => {
+      return [d.lon, d.lat];
+    },
+    getRadius: 8,
+    getFillColor: [217, 70, 239],
   });
 
   const runPathFinding = () => {
     switch (selectedAlgorithm) {
       case "BFS":
-        bfs();
+        const { path: bfsPath, explored: bfsExplored } = bfs();
+        if (!bfsExplored || !bfsPath) {
+          throw new Error("No solution found");
+        }
+        animateSolution(bfsExplored, bfsPath);
         break;
+
       case "DFS":
-        dfs();
+        const { path: dfsPath, explored: dfsExplored } = dfs();
+        if (!dfsExplored || !dfsPath) {
+          throw new Error("No solution found");
+        }
+        animateSolution(dfsExplored, dfsPath);
+
         break;
+
       default:
         console.error("No algorithm was selected");
         break;
     }
   };
 
+  const animateNodes = (exploredNodes: number[], timing: number = 50) => {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        const currentNode = exploredNodes.shift();
+        if (!currentNode) {
+          clearInterval(interval);
+          resolve(null);
+        }
+        setExploredIDs((prev) => [...prev, currentNode as number]);
+        setCurrentID(currentNode as number);
+      }, timing);
+    });
+  };
+
+  const animateSolution = async (
+    exploredNodes: number[],
+    solutionPath: number[],
+    timing: number = 75
+  ) => {
+    await animateNodes(exploredNodes);
+    const interval = setInterval(() => {
+      const currentNode = solutionPath.shift();
+      if (!currentNode) clearInterval(interval);
+      setSolutionIDs((prev) => [...prev, currentNode as number]);
+    }, timing);
+  };
+
   const constructPath = (
     memory: { parent: number | null; child: number }[]
-  ) => {
+  ): number[] => {
     //Traverse the parents from the destination until you hit null (origin)
     let path = [];
     let currentNode = memory.find((node) => node.child === destination);
@@ -88,10 +139,13 @@ export default function Home() {
       path.push(currentNode?.parent);
       currentNode = memory.find((node) => node.child === currentNode?.parent);
     }
-    setSolutionIDs(path as number[]);
+    return path as number[];
   };
 
-  const bfs = () => {
+  const bfs = (): {
+    path: number[] | null;
+    explored: number[] | null;
+  } => {
     const frontier: number[] = [];
     const explored: number[] = [];
     const memory: { parent: number | null; child: number }[] = [];
@@ -104,9 +158,8 @@ export default function Home() {
       let currentNode = graph.find((node) => node.id === currentID);
 
       if (currentID === destination) {
-        setDisplayNodeIDs((prev) => [...prev, destination]);
-        constructPath(memory);
-        return;
+        const path = constructPath(memory);
+        return { path: path, explored: explored };
       }
 
       currentNode?.adjNodes.map((adjID: number) => {
@@ -114,28 +167,29 @@ export default function Home() {
           explored.push(adjID);
           frontier.push(adjID);
           memory.push({ parent: currentID as number, child: adjID });
-          setDisplayNodeIDs((prev) => [...prev, adjID]);
         }
       });
     }
+    return { path: null, explored: null };
   };
 
-  const dfs = () => {
+  const dfs = (): {
+    path: number[] | null;
+    explored: number[] | null;
+  } => {
     const frontier: number[] = [];
     const explored: number[] = [];
     const memory: { parent: number | null; child: number }[] = [];
     frontier.push(origin);
-    //@ts-ignore
     memory.push({ parent: null, child: origin });
 
     while (frontier.length !== 0) {
-      const currentID = frontier.pop(); //Grab currentID
+      const currentID = frontier.pop();
       let currentNode = graph.find((node) => node.id === currentID);
 
       if (currentID === destination) {
-        setDisplayNodeIDs((prev) => [...prev, destination]);
-        constructPath(memory);
-        return;
+        const path = constructPath(memory);
+        return { path: path, explored: explored };
       }
 
       if (!explored.includes(currentID as number)) {
@@ -143,17 +197,10 @@ export default function Home() {
         currentNode?.adjNodes.map((adjID: number) => {
           frontier.push(adjID);
           memory.push({ parent: currentID as number, child: adjID });
-          setDisplayNodeIDs(explored);
         });
       }
     }
-  };
-
-  const traverseGraph = () => {
-    setDisplayNodeIDs((prev) => [
-      ...prev,
-      ...explored.map((node) => node.adjNodes).flat(1),
-    ]);
+    return { path: null, explored: null };
   };
 
   return (
@@ -164,7 +211,14 @@ export default function Home() {
         <Controls traverseGraph={runPathFinding} />
       </section>
       <section className="w-2/3 h-full">
-        <MapContainer layers={[nodesLayer, displayLayer, solutionLayer]} />
+        <MapContainer
+          layers={[
+            nodesLayer,
+            displayLayer,
+            currentExploredLayer,
+            solutionLayer,
+          ]}
+        />
       </section>
     </main>
   );
