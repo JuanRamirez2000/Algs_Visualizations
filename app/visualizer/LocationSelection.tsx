@@ -7,8 +7,8 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-type Range = "short" | "medium" | "long";
-const ranges: Range[] = ["short", "medium", "long"];
+type Range = "short" | "med" | "long";
+const ranges: Range[] = ["short", "med", "long"];
 
 export default function LocationSelection() {
   const searchParams = useSearchParams();
@@ -37,7 +37,7 @@ export default function LocationSelection() {
           <RadioGroup.Option
             value={location.name}
             key={location.name}
-            className="transition-all rounded-lg hover:scale-105 w-full
+            className="transition-all rounded-lg hover:scale-105 w-48
           bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600"
           >
             <Link
@@ -58,17 +58,17 @@ export default function LocationSelection() {
         defaultValue={"medium"}
       >
         <RadioGroup.Label className="text-3xl">Range</RadioGroup.Label>
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-col lg:flex-row gap-2">
           {ranges.map((range) => (
             <RadioGroup.Option
               value={range}
               key={range}
-              className="transition-all rounded-lg hover:scale-105 w-full
-            bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600"
+              className="transition-all rounded-lg hover:scale-105 w-24
+            bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600  px-3 py-3"
             >
               <Link
                 href={pathName + "?" + createQueryString("range", range)}
-                className="flex flex-row items-center justify-between text-center px-4 py-3"
+                className="flex flex-row items-center justify-between"
               >
                 {range}
                 <MapPinIcon className="h-7 w-7 hidden ui-checked:block" />

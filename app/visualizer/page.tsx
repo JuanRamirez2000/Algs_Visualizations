@@ -205,12 +205,12 @@ export default function Home() {
 
   return (
     <main className="flex flex-row h-screen w-screen">
-      <section className="w-1/3 h-full bg-base-800 flex flex-col items-center text-zinc-100 py-20 gap-10">
+      <section className="w-1/2 lg:w-2/5 xl:w-1/3 2xl:w-1/4 h-full bg-base-800 flex flex-col items-center text-zinc-100 py-20 gap-10">
         <LocationSelection />
         <AlgorithmSelection />
         <Controls traverseGraph={runPathFinding} />
       </section>
-      <section className="w-2/3 h-full">
+      <section className="w-1/2 lg:w-3/5 xl:w-2/3 2xl:w-3/4 h-full">
         <MapContainer
           layers={[
             nodesLayer,

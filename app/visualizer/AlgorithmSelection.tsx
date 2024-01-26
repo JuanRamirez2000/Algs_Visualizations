@@ -26,13 +26,13 @@ export default function AlgorithmSelection() {
       value={selectedAlgorithm}
     >
       <RadioGroup.Label className="text-3xl">Algorithms</RadioGroup.Label>
-      <div className="w-full grid grid-cols-2 gap-4">
+      <div className="w-fit flex flex-col lg:grid lg:grid-cols-2 gap-4 items-center justify-center">
         {algorithms.map((algorithm) => (
           <RadioGroup.Option
             value={algorithm.abbreviation}
             key={algorithm.abbreviation}
-            className="transition-all rounded-lg hover:scale-105 w-full
-          bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600"
+            className="transition-all rounded-lg hover:scale-105 w-24
+          bg-base-600 ui-active:bg-primary-600 ui-checked:bg-primary-600 px-3 py-3"
           >
             <Link
               href={
@@ -40,7 +40,7 @@ export default function AlgorithmSelection() {
                 "?" +
                 createQueryString("algorithm", algorithm.abbreviation)
               }
-              className="flex flex-row items-center justify-between text-center px-4 py-3"
+              className="flex flex-row items-center justify-around"
             >
               {algorithm.abbreviation}
               <CpuChipIcon className="h-7 w-7 hidden ui-checked:block" />
