@@ -5,27 +5,57 @@ import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
 import MapContainer from "./MapContainer";
 import data from "../_data/test.json";
-import { Dispatch, SetStateAction, useState } from "react";
-import { ScatterplotLayer } from "@deck.gl/layers/typed";
-import { Node } from "../helpers/parseOsm";
+import { useEffect, useState } from "react";
+import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
 
-//const initialNodeIDs = [122804252, 1925338334];
 const destination = 11375332250;
 const origin = 1925338334;
-const initialNodeIDs = [origin];
+const NODES_EXPLORED_TIMER = 10;
+const SOLUTION_PATH_TIMER = 25;
 
 export default function Home() {
-  const [graph, _] = useState<Node[]>(
+  const graph =
     //@ts-ignore
-    Object.keys(data).map((key) => data[key])
-  );
+    Object.keys(data).map((key) => data[key]);
   const searchParams = useSearchParams();
   const selectedAlgorithm = searchParams.get("algorithm");
 
-  const [exploredIDs, setExploredIDs] = useState<number[]>(initialNodeIDs);
+  const [exploredIDs, setExploredIDs] = useState<number[]>([origin]);
   const [solutionIDs, setSolutionIDs] = useState<number[]>([]);
   const [currentID, setCurrentID] = useState<number>(origin);
+
+  useEffect(() => {
+    setExploredIDs([origin]);
+    setSolutionIDs([]);
+    setCurrentID(origin);
+  }, [searchParams]);
+
+  //* Nodes that have been explored currently by the pathfinding algorithm
+  const exploredNodes = graph.filter((node) => exploredIDs.includes(node.id));
+
+  //* Constructus a path following the "construct path" function
+  //* Path nodes have to be in the form {from: Node, to: Node}
+  //* This is because of the DeckGL line Layer
+  //* https://deck.gl/docs/api-reference/layers/line-layer
+  const solutionPath = solutionIDs.map((nodeID, i) => {
+    const source = nodeID;
+    let destinationID = {};
+    if (i === solutionIDs.length - 1) {
+      destinationID = solutionIDs[i];
+    } else {
+      destinationID = solutionIDs[i + 1];
+    }
+    const sourceNode = graph.filter((node) => node.id === source);
+    const destinationNode = graph.filter((node) => node.id === destinationID);
+
+    return {
+      from: sourceNode[0],
+      to: destinationNode[0],
+    };
+  });
+  //* The current node to be displayed
+  const currentNode = graph.filter((node) => node.id === currentID);
 
   const nodesLayer = new ScatterplotLayer({
     id: "originalNodes",
@@ -40,13 +70,9 @@ export default function Home() {
     onClick: (info) => console.log(info),
   });
 
-  const explored = graph.filter((node) => exploredIDs.includes(node.id));
-  const solution = graph.filter((node) => solutionIDs?.includes(node.id));
-  const currentNode = graph.filter((node) => node.id === currentID);
-
-  const displayLayer = new ScatterplotLayer({
+  const exploredLayer = new ScatterplotLayer({
     id: "displayingNodes",
-    data: explored,
+    data: exploredNodes,
     filled: true,
     getPosition: (d) => {
       return [d.lon, d.lat];
@@ -55,15 +81,13 @@ export default function Home() {
     getFillColor: [139, 92, 246],
   });
 
-  const solutionLayer = new ScatterplotLayer({
-    id: "solutionNodes",
-    data: solution,
-    filled: true,
-    getPosition: (d) => {
-      return [d.lon, d.lat];
-    },
-    getRadius: 5,
-    getFillColor: [239, 68, 68],
+  const solutionLayer = new LineLayer({
+    id: "solutionPath",
+    data: solutionPath,
+    getSourcePosition: (d) => [d.from.lon, d.from.lat],
+    getTargetPosition: (d) => [d.to.lon, d.to.lat],
+    getWidth: 3,
+    getColor: [239, 68, 68],
   });
 
   const currentExploredLayer = new ScatterplotLayer({
@@ -102,7 +126,10 @@ export default function Home() {
     }
   };
 
-  const animateNodes = (exploredNodes: number[], timing: number = 50) => {
+  const animateNodes = (
+    exploredNodes: number[],
+    timing: number = NODES_EXPLORED_TIMER
+  ) => {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         const currentNode = exploredNodes.shift();
@@ -115,24 +142,27 @@ export default function Home() {
       }, timing);
     });
   };
-
   const animateSolution = async (
-    exploredNodes: number[],
-    solutionPath: number[],
-    timing: number = 75
+    exploredNodeIDs: number[],
+    solutionPathIDs: number[],
+    timing: number = SOLUTION_PATH_TIMER
   ) => {
-    await animateNodes(exploredNodes);
+    await animateNodes(exploredNodeIDs);
     const interval = setInterval(() => {
-      const currentNode = solutionPath.shift();
-      if (!currentNode) clearInterval(interval);
-      setSolutionIDs((prev) => [...prev, currentNode as number]);
+      const currentNodeID = solutionPathIDs.shift();
+      //if we dont do this check the last node becomes undefined
+      if (!currentNodeID || solutionPathIDs.length === 1) {
+        clearInterval(interval);
+      }
+      setSolutionIDs((prev) => [...prev, currentNodeID as number]);
     }, timing);
   };
 
   const constructPath = (
     memory: { parent: number | null; child: number }[]
   ): number[] => {
-    //Traverse the parents from the destination until you hit null (origin)
+    //Traverses each node and goes back to its parent
+    //This assumes a soltuion has been found and it is the most optimal solution
     let path = [];
     let currentNode = memory.find((node) => node.child === destination);
     while (currentNode?.parent !== null) {
@@ -214,7 +244,7 @@ export default function Home() {
         <MapContainer
           layers={[
             nodesLayer,
-            displayLayer,
+            exploredLayer,
             currentExploredLayer,
             solutionLayer,
           ]}
