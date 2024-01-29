@@ -31,7 +31,6 @@ export default function Home() {
     setCurrentID(origin);
   }, [searchParams]);
 
-  //* Nodes that have been explored currently by the pathfinding algorithm
   const exploredNodes = graph.filter((node) => exploredIDs.includes(node.id));
 
   //* Constructus a path following the "construct path" function
@@ -54,7 +53,6 @@ export default function Home() {
       to: destinationNode[0],
     };
   });
-  //* The current node to be displayed
   const currentNode = graph.filter((node) => node.id === currentID);
 
   const nodesLayer = new ScatterplotLayer({
