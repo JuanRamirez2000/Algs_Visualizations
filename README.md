@@ -1,6 +1,6 @@
-## Road Trip Playlists
+## Algs Visualizer
 
-A web app used for educational purposes to display the efficiency of different path finding algorithms
+A web app used for educational purposes to currently display the efficiency of different path finding algorithms with future plans to make this a one-stop-shop to learn all forms of algorithms.
 
 ## A Note On Contributions:
 
@@ -12,17 +12,17 @@ Frontend Tech
 
 - ReactJS
 - TypescriptJS
+- TailwindCSS
 - Mapbox API
 
 Backend tech
 
 - NextJS (app Directory)
+- Open Street Maps
 
 Infra
 
 - Vercel
-- Open Street Maps
-
 
 ## Current and Future Additions (Stage 1 - Scaffolding):
 
