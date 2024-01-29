@@ -2,6 +2,8 @@
 
 A web app used for educational purposes to currently display the efficiency of different path finding algorithms with future plans to make this a one-stop-shop to learn all forms of algorithms.
 
+![](https://github.com/JuanRamirez2000/Algs_Visualizations/blob/main/app/assets/gifs/dfs.gif)
+
 ## A Note On Contributions:
 
 Contributions are closed right now due to this being a personal project. However during production I might be inclined to add more users to the project
