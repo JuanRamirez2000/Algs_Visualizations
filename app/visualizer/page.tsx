@@ -9,10 +9,11 @@ import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
 
-const destination = 11375332250;
+const destination = 123021219;
 const origin = 1925338334;
 const NODES_EXPLORED_TIMER = 10;
 const SOLUTION_PATH_TIMER = 25;
+const waypointNodesIDs: number[] = [origin, destination];
 
 export default function Home() {
   const graph =
@@ -31,8 +32,15 @@ export default function Home() {
     setCurrentID(origin);
   }, [searchParams]);
 
-  const exploredNodes = graph.filter((node) => exploredIDs.includes(node.id));
+  //---------------------------------//
+  //---------Layer Node Data---------//
+  //---------------------------------//
 
+  const exploredNodes = graph.filter((node) => exploredIDs.includes(node.id));
+  const currentNode = graph.filter((node) => node.id === currentID);
+  const waypointNodes = graph.filter((node) =>
+    waypointNodesIDs.includes(node.id)
+  );
   //* Constructus a path following the "construct path" function
   //* Path nodes have to be in the form {from: Node, to: Node}
   //* This is because of the DeckGL line Layer
@@ -53,8 +61,33 @@ export default function Home() {
       to: destinationNode[0],
     };
   });
-  const currentNode = graph.filter((node) => node.id === currentID);
 
+  //---------------------------------//
+  //---------Layer Instances---------//
+  //---------------------------------//
+  //* Layers are in order from top to bottom
+  //* Top are rendered last and are shown above all other layers
+
+  //? Shown as rose-500
+  const waypointLayer = new ScatterplotLayer({
+    id: "waypointNodes",
+    data: waypointNodes,
+    getRadius: 10,
+    getPosition: (d) => [d.lon, d.lat],
+    getFillColor: [244, 63, 94],
+  });
+
+  //? Shown as rose-500
+  const solutionLayer = new LineLayer({
+    id: "solutionPath",
+    data: solutionPath,
+    getSourcePosition: (d) => [d.from.lon, d.from.lat],
+    getTargetPosition: (d) => [d.to.lon, d.to.lat],
+    getWidth: 4,
+    getColor: [244, 63, 94],
+  });
+
+  //? Shown as white
   const nodesLayer = new ScatterplotLayer({
     id: "originalNodes",
     data: graph,
@@ -68,35 +101,24 @@ export default function Home() {
     onClick: (info) => console.log(info),
   });
 
+  //? Shown as sky-500
   const exploredLayer = new ScatterplotLayer({
     id: "displayingNodes",
     data: exploredNodes,
     filled: true,
-    getPosition: (d) => {
-      return [d.lon, d.lat];
-    },
-    getRadius: 5,
-    getFillColor: [139, 92, 246],
+    getPosition: (d) => [d.lon, d.lat],
+    getRadius: 4,
+    getFillColor: [14, 165, 233],
   });
 
-  const solutionLayer = new LineLayer({
-    id: "solutionPath",
-    data: solutionPath,
-    getSourcePosition: (d) => [d.from.lon, d.from.lat],
-    getTargetPosition: (d) => [d.to.lon, d.to.lat],
-    getWidth: 3,
-    getColor: [239, 68, 68],
-  });
-
+  //? Shown as amber-500
   const currentExploredLayer = new ScatterplotLayer({
     id: "currentNode",
     data: currentNode,
     filled: true,
-    getPosition: (d) => {
-      return [d.lon, d.lat];
-    },
+    getPosition: (d) => [d.lon, d.lat],
     getRadius: 8,
-    getFillColor: [217, 70, 239],
+    getFillColor: [245, 158, 11],
   });
 
   const runPathFinding = () => {
@@ -149,7 +171,7 @@ export default function Home() {
     const interval = setInterval(() => {
       const currentNodeID = solutionPathIDs.shift();
       //if we dont do this check the last node becomes undefined
-      if (!currentNodeID || solutionPathIDs.length === 1) {
+      if (!currentNodeID || solutionPathIDs.length === 0) {
         clearInterval(interval);
       }
       setSolutionIDs((prev) => [...prev, currentNodeID as number]);
@@ -242,9 +264,10 @@ export default function Home() {
         <MapContainer
           layers={[
             nodesLayer,
-            exploredLayer,
             currentExploredLayer,
+            exploredLayer,
             solutionLayer,
+            waypointLayer,
           ]}
         />
       </section>
