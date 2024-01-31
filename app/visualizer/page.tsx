@@ -214,15 +214,18 @@ export default function Home() {
     }, timing);
   };
 
+  //*Traverses each node and goes back to its parent
+  //*This assumes a soltuion has been found and it is the most optimal solution
   const constructPath = (
     memory: { parent: number | null; child: number }[]
   ): number[] => {
-    //Traverses each node and goes back to its parent
-    //This assumes a soltuion has been found and it is the most optimal solution
-    let path = [];
+    let path: number[] = [];
+    //! This line is needed to reconstruct the tail of the path
+    //! Leading from destination to 2nd to last node
+    path.push(destination);
     let currentNode = memory.find((node) => node.child === destination);
     while (currentNode?.parent !== null) {
-      path.push(currentNode?.parent);
+      path.push(currentNode?.parent as number);
       currentNode = memory.find((node) => node.child === currentNode?.parent);
     }
     return path as number[];
@@ -244,6 +247,7 @@ export default function Home() {
       let currentNode = graph.find((node) => node.id === currentID);
 
       if (currentID === destination) {
+        memory.push({ parent: currentID as number, child: destination });
         const path = constructPath(memory);
         return { path: path, explored: explored };
       }
@@ -274,6 +278,7 @@ export default function Home() {
       let currentNode = graph.find((node) => node.id === currentID);
 
       if (currentID === destination) {
+        memory.push({ parent: currentID as number, child: destination });
         const path = constructPath(memory);
         return { path: path, explored: explored };
       }
