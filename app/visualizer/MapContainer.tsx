@@ -8,7 +8,7 @@ import Map, {
 import { MapRef } from "react-map-gl";
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { locations } from "../_data/locations";
+import { locations } from "../data/locations";
 import { MapboxOverlay, MapboxOverlayProps } from "@deck.gl/mapbox/typed";
 import { useControl } from "react-map-gl";
 import type { LayersList } from "deck.gl/typed";

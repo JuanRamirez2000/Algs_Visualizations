@@ -6,7 +6,7 @@ import {
   CodeBracketSquareIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import parseData from "../_helpers/parseOsm";
+import parseData from "../helpers/parseOsm";
 import { useSearchParams } from "next/navigation";
 
 export default function Controls({

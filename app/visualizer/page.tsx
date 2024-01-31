@@ -3,11 +3,11 @@ import AlgorithmSelection from "./AlgorithmSelection";
 import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
 import MapContainer from "./MapContainer";
-import data from "../_data/test.json";
+import data from "../data/test.json";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
-import { Node } from "../_helpers/parseOsm";
+import { Node } from "../helpers/parseOsm";
 
 const destination = 122697220;
 const origin = 1925338334;

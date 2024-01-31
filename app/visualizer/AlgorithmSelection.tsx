@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { RadioGroup } from "@headlessui/react";
-import { algorithms } from "../_data/algorithms";
+import { algorithms } from "../data/algorithms";
 import { CpuChipIcon } from "@heroicons/react/24/outline";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
