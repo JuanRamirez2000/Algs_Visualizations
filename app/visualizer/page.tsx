@@ -1,5 +1,4 @@
 "use client";
-
 import AlgorithmSelection from "./AlgorithmSelection";
 import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
@@ -8,8 +7,9 @@ import data from "../_data/test.json";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
+import { Node } from "../helpers/parseOsm";
 
-const destination = 123021219;
+const destination = 122697220;
 const origin = 1925338334;
 const NODES_EXPLORED_TIMER = 10;
 const SOLUTION_PATH_TIMER = 25;
@@ -36,9 +36,11 @@ export default function Home() {
   //---------Layer Node Data---------//
   //---------------------------------//
 
-  const exploredNodes = graph.filter((node) => exploredIDs.includes(node.id));
-  const currentNode = graph.filter((node) => node.id === currentID);
-  const waypointNodes = graph.filter((node) =>
+  const exploredNodes = graph.filter((node: Node) =>
+    exploredIDs.includes(node.id)
+  );
+  const currentNode = graph.filter((node: Node) => node.id === currentID);
+  const waypointNodes = graph.filter((node: Node) =>
     waypointNodesIDs.includes(node.id)
   );
   //* Constructus a path following the "construct path" function
@@ -62,6 +64,20 @@ export default function Home() {
     };
   });
 
+  const trafficGraph: any[] = [];
+  graph.map((sourceNode: Node) => {
+    sourceNode.adjNodes.map((destinationID, idx): any => {
+      const destinationNode = graph.filter(
+        (node) => node.id === destinationID
+      )[0];
+      trafficGraph.push({
+        from: sourceNode,
+        to: destinationNode,
+        weight: sourceNode.weights[idx],
+      });
+    });
+  });
+
   //---------------------------------//
   //---------Layer Instances---------//
   //---------------------------------//
@@ -83,7 +99,7 @@ export default function Home() {
     data: solutionPath,
     getSourcePosition: (d) => [d.from.lon, d.from.lat],
     getTargetPosition: (d) => [d.to.lon, d.to.lat],
-    getWidth: 4,
+    getWidth: 6,
     getColor: [244, 63, 94],
   });
 
@@ -95,7 +111,7 @@ export default function Home() {
     getPosition: (d) => {
       return [d.lon, d.lat];
     },
-    getRadius: 2,
+    getRadius: 2.5,
     getFillColor: [255, 255, 255],
     pickable: true,
     onClick: (info) => console.log(info),
@@ -107,7 +123,7 @@ export default function Home() {
     data: exploredNodes,
     filled: true,
     getPosition: (d) => [d.lon, d.lat],
-    getRadius: 4,
+    getRadius: 6,
     getFillColor: [14, 165, 233],
   });
 
@@ -119,6 +135,26 @@ export default function Home() {
     getPosition: (d) => [d.lon, d.lat],
     getRadius: 8,
     getFillColor: [245, 158, 11],
+  });
+
+  //? Shown as multi-color per traffice weight
+  const trafficLayer = new LineLayer({
+    id: "trafficLayer",
+    data: trafficGraph,
+    getSourcePosition: (d) => [d.from.lon, d.from.lat],
+    getTargetPosition: (d) => [d.to.lon, d.to.lat],
+    getWidth: 1,
+    opacity: 0.5,
+    getColor: (d) => {
+      //* High weight, shown as red-700
+      if (d.weight > 75) return [185, 28, 28];
+
+      //* Medium weight, shown as orange-300
+      if (d.weight > 50) return [253, 186, 116];
+
+      //* Low weight, shown as green-300
+      return [74, 222, 128];
+    },
   });
 
   const runPathFinding = () => {
@@ -243,7 +279,7 @@ export default function Home() {
       }
 
       if (!explored.includes(currentID as number)) {
-        explored.push(currentID as number); //Add to explored
+        explored.push(currentID as number);
         currentNode?.adjNodes.map((adjID: number) => {
           frontier.push(adjID);
           memory.push({ parent: currentID as number, child: adjID });
@@ -263,6 +299,7 @@ export default function Home() {
       <section className="w-1/2 lg:w-3/5 xl:w-2/3 2xl:w-3/4 h-full">
         <MapContainer
           layers={[
+            trafficLayer,
             nodesLayer,
             currentExploredLayer,
             exploredLayer,
