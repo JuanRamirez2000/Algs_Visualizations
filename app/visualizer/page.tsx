@@ -7,7 +7,7 @@ import data from "../_data/test.json";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
-import { Node } from "../helpers/parseOsm";
+import { Node } from "../_helpers/parseOsm";
 
 const destination = 122697220;
 const origin = 1925338334;
