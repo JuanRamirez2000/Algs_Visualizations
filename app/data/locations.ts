@@ -3,12 +3,18 @@ type Coordinate = {
   lat: number;
 };
 
+type Range = {
+  originID: number;
+  destinationID: number;
+};
+
 type LocationInfo = {
   name: string;
   displayName: string;
   center: Coordinate;
-  origin_short?: Coordinate;
-  destination_short?: Coordinate;
+  short?: Range;
+  medium?: Range;
+  long?: Range;
 };
 
 const locations: LocationInfo[] = [
@@ -18,6 +24,18 @@ const locations: LocationInfo[] = [
     center: {
       long: -117.8667,
       lat: 33.7477,
+    },
+    short: {
+      originID: 1925338334,
+      destinationID: 6371463716,
+    },
+    medium: {
+      originID: 1925338334,
+      destinationID: 11375332264,
+    },
+    long: {
+      originID: 1925338334,
+      destinationID: 123021219,
     },
   },
   {

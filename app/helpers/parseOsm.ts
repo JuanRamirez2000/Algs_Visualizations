@@ -1,5 +1,5 @@
 "use server";
-import roads from "../data/export.json";
+import roads from "../data/originalTest.json";
 import * as fs from "fs";
 
 //! TODO Fix these types

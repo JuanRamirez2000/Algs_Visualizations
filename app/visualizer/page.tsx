@@ -4,33 +4,62 @@ import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
 import MapContainer from "./MapContainer";
 import data from "../data/test.json";
+import { locations } from "../data/locations";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
 import { Node } from "../helpers/parseOsm";
 
-const destination = 122697220;
-const origin = 1925338334;
+const defaultOrigin = 1925338334;
+const defaultDestination = 6371463716;
 const NODES_EXPLORED_TIMER = 10;
 const SOLUTION_PATH_TIMER = 25;
-const waypointNodesIDs: number[] = [origin, destination];
-
+const ranges = [
+  {
+    distance: "short",
+    originID: 1925338334,
+    destinationID: 6371463716,
+  },
+  {
+    distance: "med",
+    originID: 1925338334,
+    destinationID: 11375332264,
+  },
+  {
+    distance: "long",
+    originID: 1925338334,
+    destinationID: 123021219,
+  },
+];
 export default function Home() {
   const graph =
     //@ts-ignore
     Object.keys(data).map((key) => data[key]);
   const searchParams = useSearchParams();
+  const selectedRange = searchParams.get("range");
   const selectedAlgorithm = searchParams.get("algorithm");
 
+  const [origin, setOrigin] = useState<number>(defaultOrigin);
+  const [destination, setDestination] = useState<number>(defaultDestination);
   const [exploredIDs, setExploredIDs] = useState<number[]>([origin]);
   const [solutionIDs, setSolutionIDs] = useState<number[]>([]);
   const [currentID, setCurrentID] = useState<number>(origin);
 
+  const waypointNodesIDs: number[] = [origin, destination];
+
   useEffect(() => {
+    if (selectedRange) {
+      const { originID, destinationID } = ranges.find(
+        (range) => range.distance === selectedRange
+      )!;
+      setOrigin(originID);
+      setDestination(destinationID);
+    }
+
     setExploredIDs([origin]);
     setSolutionIDs([]);
     setCurrentID(origin);
-  }, [searchParams]);
+  }, [searchParams, origin, selectedRange]);
 
   //---------------------------------//
   //---------Layer Node Data---------//
@@ -55,21 +84,19 @@ export default function Home() {
     } else {
       destinationID = solutionIDs[i + 1];
     }
-    const sourceNode = graph.filter((node) => node.id === source);
-    const destinationNode = graph.filter((node) => node.id === destinationID);
+    const sourceNode = graph.find((node) => node.id === source);
+    const destinationNode = graph.find((node) => node.id === destinationID);
 
     return {
-      from: sourceNode[0],
-      to: destinationNode[0],
+      from: sourceNode,
+      to: destinationNode,
     };
   });
 
   const trafficGraph: any[] = [];
   graph.map((sourceNode: Node) => {
     sourceNode.adjNodes.map((destinationID, idx): any => {
-      const destinationNode = graph.filter(
-        (node) => node.id === destinationID
-      )[0];
+      const destinationNode = graph.find((node) => node.id === destinationID);
       trafficGraph.push({
         from: sourceNode,
         to: destinationNode,
@@ -88,7 +115,7 @@ export default function Home() {
   const waypointLayer = new ScatterplotLayer({
     id: "waypointNodes",
     data: waypointNodes,
-    getRadius: 10,
+    getRadius: 14,
     getPosition: (d) => [d.lon, d.lat],
     getFillColor: [244, 63, 94],
   });
