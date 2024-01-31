@@ -4,7 +4,6 @@ import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
 import MapContainer from "./MapContainer";
 import data from "../data/test.json";
-import { locations } from "../data/locations";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
@@ -200,7 +199,6 @@ export default function Home() {
           throw new Error("No solution found");
         }
         animateSolution(dfsExplored, dfsPath);
-
         break;
 
       default:
