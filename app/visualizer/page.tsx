@@ -192,7 +192,7 @@ export default function Home() {
     if (selectedAlgorithm === "BFS") {
       const { path, explored } = bfs(origin, destination, graph);
       if (!path || !explored) {
-        console.log("Pathfinding Failed");
+        console.error("Pathfinding Failed");
         return;
       }
       animateSolution(
@@ -207,12 +207,12 @@ export default function Home() {
     if (selectedAlgorithm === "DFS") {
       const { path, explored } = dfs(origin, destination, graph);
       if (!path || !explored) {
-        console.log("Pathfinding Failed");
+        console.error("Pathfinding Failed");
         return;
       }
       animateSolution(
-        exploredNodes,
-        solutionIDs,
+        explored,
+        path,
         25,
         setSolutionIDs,
         setExploredIDs,
