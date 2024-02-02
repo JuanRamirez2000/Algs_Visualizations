@@ -35,7 +35,8 @@ Infra
 - [ ] A*
 - [ ] Djikstra's
 - [ ] OSM Data parser (currently broken)
-- [ ] Ability for users to select an origin and destination
+~~ - [x] Ability for users to select an origin and destination ~~
+    ~~ - [x] Moving onto stage 3~~
 
 ## Future Additions (Stage 2 - Explaners)
 - [ ] Info page for each algorithm
