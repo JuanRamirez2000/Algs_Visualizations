@@ -9,11 +9,10 @@ import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
 import { Node } from "../helpers/parseOsm";
 import { dfs, bfs } from "./PathFindingAlgs";
+import { animateSolution } from "./Animations";
 
 const defaultOrigin = 1925338334;
 const defaultDestination = 6371463716;
-const NODES_EXPLORED_TIMER = 10;
-const SOLUTION_PATH_TIMER = 25;
 const ranges = [
   {
     distance: "short",
@@ -185,67 +184,41 @@ export default function Home() {
   });
 
   const runPathFinding = () => {
-    switch (selectedAlgorithm) {
-      case "BFS":
-        const { path: bfsPath, explored: bfsExplored } = bfs(
-          origin,
-          destination,
-          graph
-        );
-        if (!bfsExplored || !bfsPath) {
-          throw new Error("No solution found");
-        }
-        animateSolution(bfsExplored, bfsPath);
-        break;
-
-      case "DFS":
-        const { path: dfsPath, explored: dfsExplored } = dfs(
-          origin,
-          destination,
-          graph
-        );
-        if (!dfsExplored || !dfsPath) {
-          throw new Error("No solution found");
-        }
-        animateSolution(dfsExplored, dfsPath);
-        break;
-
-      default:
-        console.error("No algorithm was selected");
-        break;
+    if (!selectedAlgorithm) {
+      console.error("No Selected Algorithm");
+      return;
     }
-  };
 
-  const animateNodes = (
-    exploredNodes: number[],
-    timing: number = NODES_EXPLORED_TIMER
-  ) => {
-    return new Promise((resolve) => {
-      const interval = setInterval(() => {
-        const currentNode = exploredNodes.shift();
-        if (!currentNode) {
-          clearInterval(interval);
-          resolve(null);
-        }
-        setExploredIDs((prev) => [...prev, currentNode as number]);
-        setCurrentID(currentNode as number);
-      }, timing);
-    });
-  };
-  const animateSolution = async (
-    exploredNodeIDs: number[],
-    solutionPathIDs: number[],
-    timing: number = SOLUTION_PATH_TIMER
-  ) => {
-    await animateNodes(exploredNodeIDs);
-    const interval = setInterval(() => {
-      const currentNodeID = solutionPathIDs.shift();
-      //if we dont do this check the last node becomes undefined
-      if (!currentNodeID || solutionPathIDs.length === 0) {
-        clearInterval(interval);
+    if (selectedAlgorithm === "BFS") {
+      const { path, explored } = bfs(origin, destination, graph);
+      if (!path || !explored) {
+        console.log("Pathfinding Failed");
+        return;
       }
-      setSolutionIDs((prev) => [...prev, currentNodeID as number]);
-    }, timing);
+      animateSolution(
+        explored,
+        path,
+        25,
+        setSolutionIDs,
+        setExploredIDs,
+        setCurrentID
+      );
+    }
+    if (selectedAlgorithm === "DFS") {
+      const { path, explored } = dfs(origin, destination, graph);
+      if (!path || !explored) {
+        console.log("Pathfinding Failed");
+        return;
+      }
+      animateSolution(
+        exploredNodes,
+        solutionIDs,
+        25,
+        setSolutionIDs,
+        setExploredIDs,
+        setCurrentID
+      );
+    }
   };
 
   return (
