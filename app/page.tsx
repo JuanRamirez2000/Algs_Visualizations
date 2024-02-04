@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
+import ExampleMap from "./ExampleMap";
 
 export default function Home() {
-  redirect("/visualizer");
+  return (
+    <div className="h-screen w-screen">
+      <ExampleMap />
+    </div>
+  );
 }

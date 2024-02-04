@@ -4,6 +4,7 @@ import Map, {
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
+  ViewState,
 } from "react-map-gl";
 import { MapRef } from "react-map-gl";
 import { useEffect, useRef } from "react";
@@ -21,7 +22,15 @@ const SANTA_ANA_CENTER = {
   lat: 33.7477,
 };
 
-export default function MapContainer({ layers }: { layers: LayersList }) {
+export default function MapContainer({
+  layers,
+  initialViewState,
+  disableControls = false,
+}: {
+  layers: LayersList;
+  initialViewState?: Partial<ViewState>;
+  disableControls?: boolean;
+}) {
   const mapRef = useRef<MapRef>(null);
   const searchParams = useSearchParams();
   const locationName = searchParams.get("location");
@@ -46,21 +55,36 @@ export default function MapContainer({ layers }: { layers: LayersList }) {
         mapStyle="mapbox://styles/mapbox/dark-v11"
         style={{ width: "width: 100%", height: "100%" }}
         mapboxAccessToken={NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        initialViewState={{
-          longitude: locationData
-            ? locationData.center.long
-            : SANTA_ANA_CENTER.long,
-          latitude: locationData
-            ? locationData.center.lat
-            : SANTA_ANA_CENTER.lat,
-          zoom: 12,
-        }}
+        initialViewState={
+          initialViewState
+            ? initialViewState
+            : {
+                longitude: locationData
+                  ? locationData.center.long
+                  : SANTA_ANA_CENTER.long,
+                latitude: locationData
+                  ? locationData.center.lat
+                  : SANTA_ANA_CENTER.lat,
+                zoom: 12,
+              }
+        }
+        boxZoom={!disableControls}
+        doubleClickZoom={!disableControls}
+        dragRotate={!disableControls}
+        dragPan={!disableControls}
+        scrollZoom={!disableControls}
+        touchPitch={!disableControls}
+        touchZoomRotate={!disableControls}
       >
         <DeckGLOverlay layers={layers} />
-        <NavigationControl />
-        <ScaleControl />
-        <FullscreenControl />
-        <GeolocateControl />
+        {!disableControls ? (
+          <>
+            <NavigationControl />
+            <ScaleControl />
+            <FullscreenControl />
+            <GeolocateControl />
+          </>
+        ) : null}
       </Map>
     </section>
   );

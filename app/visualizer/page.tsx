@@ -2,7 +2,7 @@
 import AlgorithmSelection from "./AlgorithmSelection";
 import Controls from "./Controls";
 import LocationSelection from "./LocationSelection";
-import MapContainer from "./MapContainer";
+import MapContainer from "../components/MapContainer";
 import data from "../data/test.json";
 import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
@@ -124,6 +124,7 @@ export default function Home() {
     id: "solutionPath",
     data: solutionPath,
     getSourcePosition: (d) => [d.from.lon, d.from.lat],
+
     getTargetPosition: (d) => [d.to.lon, d.to.lat],
     getWidth: 6,
     getColor: [244, 63, 94],
@@ -223,7 +224,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-row h-screen w-screen">
-      <section className="w-1/2 lg:w-2/5 xl:w-1/3 2xl:w-1/4 h-full bg-base-800 flex flex-col items-center text-zinc-100 py-20 gap-10">
+      <section className="w-1/2 lg:w-2/5 xl:w-1/3 2xl:w-1/4 h-full flex flex-col items-center py-20 gap-10">
         <LocationSelection />
         <AlgorithmSelection />
         <Controls traverseGraph={runPathFinding} />
