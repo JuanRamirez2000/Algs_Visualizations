@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import { ScatterplotLayer, LineLayer } from "@deck.gl/layers/typed";
 import { useSearchParams } from "next/navigation";
 import { Node } from "../helpers/parseOsm";
-import { dfs, bfs } from "./PathFindingAlgs";
-import { animateSolution } from "./Animations";
+import { dfs, bfs } from "../helpers/PathFindingAlgs";
+import { animateSolution } from "../helpers/Animations";
 
 const defaultOrigin = 1925338334;
 const defaultDestination = 6371463716;
