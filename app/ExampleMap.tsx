@@ -7,18 +7,21 @@ import { bfs } from "./helpers/PathFindingAlgs";
 import type { Node } from "./helpers/parseOsm";
 
 const SANTA_ANA_CENTER = {
-  long: -117.8667,
-  lat: 33.7477,
+  long: -117.86359375972935,
+  lat: 33.75146457981744,
 };
 
 const ORIGIN = 1925338334;
 const DESTINATION = 123021219;
 const WAY_POINT_NODE_IDS = [ORIGIN, DESTINATION];
 const DEFAULT_HEIGHT = 20;
-const UNSELECTED_LAYER_OPACITY = 0.2;
-const selectedLayer: string = "solutionPath";
+const UNSELECTED_LAYER_OPACITY = 0.05;
 
-export default function ExampleMap() {
+export default function ExampleMap({
+  highlightedLayer,
+}: {
+  highlightedLayer: string;
+}) {
   const graph =
     //@ts-ignore
     Object.keys(data).map((key) => data[key]);
@@ -66,9 +69,9 @@ export default function ExampleMap() {
   const waypointLayer = new ScatterplotLayer({
     id: "waypointNodes",
     data: waypointNodes,
-    opacity: selectedLayer === "waypointNodes" ? 1 : UNSELECTED_LAYER_OPACITY,
+    opacity: highlightedLayer === "baseLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
     getRadius: 14,
-    getPosition: (d) => [d.lon, d.lat, DEFAULT_HEIGHT * 0],
+    getPosition: (d) => [d.lon, d.lat, DEFAULT_HEIGHT * 5],
     getFillColor: [244, 63, 94],
   });
 
@@ -76,7 +79,8 @@ export default function ExampleMap() {
   const solutionLayer = new LineLayer({
     id: "solutionPath",
     data: solutionPath,
-    opacity: selectedLayer === "solutionPath" ? 1 : UNSELECTED_LAYER_OPACITY,
+    opacity:
+      highlightedLayer === "solutionLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
     getSourcePosition: (d) => [d.from.lon, d.from.lat, DEFAULT_HEIGHT * 15],
     getTargetPosition: (d) => [d.to.lon, d.to.lat, DEFAULT_HEIGHT * 15],
     getWidth: 6,
@@ -87,7 +91,7 @@ export default function ExampleMap() {
   const nodesLayer = new ScatterplotLayer({
     id: "originalNodes",
     data: graph,
-    opacity: selectedLayer === "originalNodes" ? 1 : UNSELECTED_LAYER_OPACITY,
+    opacity: highlightedLayer === "baseLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
     filled: true,
     getPosition: (d) => {
       return [d.lon, d.lat, DEFAULT_HEIGHT * 5];
@@ -100,9 +104,10 @@ export default function ExampleMap() {
 
   //? Shown as sky-500
   const exploredLayer = new ScatterplotLayer({
-    id: "displayingNodes",
+    id: "exploredNodes",
     data: exploredNodes,
-    opacity: selectedLayer === "displayingNodes" ? 1 : UNSELECTED_LAYER_OPACITY,
+    opacity:
+      highlightedLayer === "exploredLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
     filled: true,
     getPosition: (d) => [d.lon, d.lat, DEFAULT_HEIGHT * 10],
     getRadius: 6,
@@ -113,7 +118,7 @@ export default function ExampleMap() {
   const trafficLayer = new LineLayer({
     id: "trafficLayer",
     data: trafficGraph,
-    opacity: selectedLayer === "trafficLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
+    opacity: highlightedLayer === "baseLayer" ? 1 : UNSELECTED_LAYER_OPACITY,
     getSourcePosition: (d) => [d.from.lon, d.from.lat, DEFAULT_HEIGHT * 5],
     getTargetPosition: (d) => [d.to.lon, d.to.lat, DEFAULT_HEIGHT * 5],
     getWidth: 1,
@@ -139,6 +144,7 @@ export default function ExampleMap() {
         waypointLayer,
       ]}
       disableControls={true}
+      rounded={true}
       initialViewState={{
         longitude: SANTA_ANA_CENTER.long,
         latitude: SANTA_ANA_CENTER.lat,

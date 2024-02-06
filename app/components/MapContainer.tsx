@@ -26,10 +26,12 @@ export default function MapContainer({
   layers,
   initialViewState,
   disableControls = false,
+  rounded = false,
 }: {
   layers: LayersList;
   initialViewState?: Partial<ViewState>;
   disableControls?: boolean;
+  rounded?: boolean;
 }) {
   const mapRef = useRef<MapRef>(null);
   const searchParams = useSearchParams();
@@ -53,7 +55,11 @@ export default function MapContainer({
         ref={mapRef}
         mapLib={import("mapbox-gl")}
         mapStyle="mapbox://styles/mapbox/dark-v11"
-        style={{ width: "width: 100%", height: "100%" }}
+        style={{
+          width: "width: 100%",
+          height: "100%",
+          borderRadius: rounded ? 40 : 0,
+        }}
         mapboxAccessToken={NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         initialViewState={
           initialViewState
